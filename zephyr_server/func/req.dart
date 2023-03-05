@@ -39,6 +39,8 @@ curl -X POST -d '{
 import 'dart:convert';
 import 'dart:io';
 
+import '../models/routeModels/generic_routes.dart';
+
 final data = {
   'origin': {
     'location': {
@@ -90,6 +92,8 @@ Future<dynamic> req() async {
   // final fuelEfficientRoute = j['routes'].firstWhere(
   //     (element) => element['routeLabels'].contains('fuelEfficientRoute'),
   //     orElse: () => null);
+
+  // GenericRoutesModel(perferedRoute: Bic)
 
   final fuelConsumptionMicroliters = int.parse(defaultRoute['travelAdvisory']
           ['fuelConsumptionMicroliters'] as String) -

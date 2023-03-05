@@ -1,9 +1,9 @@
 // Route Model
 
-import '../func/basic.dart';
+import '../../func/basic.dart';
 
-class RouteModel {
-  RouteModel({
+class VechileRouteModel {
+  VechileRouteModel({
     required this.distance,
     required this.duration,
     required this.fuelType,
@@ -12,8 +12,8 @@ class RouteModel {
     this.savedConsumption,
     this.savedEmmissions,
   });
-  factory RouteModel.fromJson(Map<String, dynamic> json) {
-    return RouteModel(
+  factory VechileRouteModel.fromJson(Map<String, dynamic> json) {
+    return VechileRouteModel(
       distance: json['distanceMeters'] as int,
       duration: int.parse(
         (json['duration'] as String)

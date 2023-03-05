@@ -1,5 +1,5 @@
 import '../../func/basic.dart';
-import '../../models/route_model.dart';
+import '../../models/routeModels/vechile_route_model.dart';
 import '../../models/route_request_model.dart';
 import '../base_api_service.dart';
 
@@ -23,7 +23,8 @@ class RouteService extends BaseApiService {
   /// - [return] Route Model
   /// Description:
   ///  - Get Route from Route Request Model
-  Future<List<RouteModel>> getRoute(RouteRequestModel routeRequestModel) async {
+  Future<List<VechileRouteModel>> getRoute(
+      RouteRequestModel routeRequestModel) async {
     final origin = routeRequestModel.origin.toJson();
     final destination = routeRequestModel.destination.toJson();
     origin.remove('name');
@@ -53,16 +54,17 @@ class RouteService extends BaseApiService {
           routeRequestModel.vehicleInfo['emissionType'];
     }
     return (response['routes'] as List)
-        .map((e) => RouteModel.fromJson(e as Map<String, dynamic>))
+        .map((e) => VechileRouteModel.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
-  /// Get ["FUEL_EFFICIENT"] route from List<RouteModel>
-  ///  - [routes] List<RouteModel>
-  /// - [return] Map<String, RouteModel>
+  /// Get ["FUEL_EFFICIENT"] route from List<VechileRouteModel>
+  ///  - [routes] List<VechileRouteModel>
+  /// - [return] Map<String, VechileRouteModel>
   /// Description:
-  /// - Get ["FUEL_EFFICIENT"] route from List<RouteModel>
-  Map<String, RouteModel> getFuelEfficientRoute(List<RouteModel> routes) {
+  /// - Get ["FUEL_EFFICIENT"] route from List<VechileRouteModel>
+  Map<String, VechileRouteModel> getFuelEfficientRoute(
+      List<VechileRouteModel> routes) {
     final fuel = routes.firstWhere((element) {
       if (element.routeLabels.contains('FUEL_EFFICIENT')) {
         return true;
@@ -86,4 +88,6 @@ class RouteService extends BaseApiService {
           basifunc.calculateEmissionsSaved(routes[0].fuelType, savedFuel);
     return {'fuelEfficientRoute': fuel, 'defaultRoute': defaultRoute};
   }
+
+  /// Get Recommended Route
 }
