@@ -1,8 +1,9 @@
 // Route Model
 
 import '../../func/basic.dart';
+import 'base_route_model.dart';
 
-class VechileRouteModel {
+class VechileRouteModel extends BaseRouteModel {
   VechileRouteModel({
     required this.distance,
     required this.duration,
@@ -11,7 +12,12 @@ class VechileRouteModel {
     required this.routeLabels,
     this.savedConsumption,
     this.savedEmmissions,
-  });
+  }) : super(
+          routeType: RouteType.vechile,
+          distance: distance,
+          duration: duration,
+        );
+
   factory VechileRouteModel.fromJson(Map<String, dynamic> json) {
     return VechileRouteModel(
       distance: json['distanceMeters'] as int,

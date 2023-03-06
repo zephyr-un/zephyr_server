@@ -16,11 +16,40 @@ import 'walking_route_model.dart';
 class GenericRoutesModel {
   // Perfered Route
   BaseRouteModel? perferedRoute;
-  Map<String, BaseRouteModel> routes = {};
-  
-
+  Map<String, Map<dynamic, dynamic>> routes = {};
 
   GenericRoutesModel({
     this.perferedRoute,
   });
+
+  /// Add route to [routes] map
+  ///
+  void addRoute(BaseRouteModel route, dynamic type) {
+    // Case for each type of route model
+    switch (type) {
+      case VechileRouteModel:
+        routes[route.routeType.toString()] =
+            (type as VechileRouteModel).toJson();
+        break;
+      case WalkingRouteModel:
+        routes[route.routeType.toString()] =
+            (type as WalkingRouteModel).toJson();
+        break;
+      case BicyclingRouteModel:
+        routes[route.routeType.toString()] =
+            (type as BicyclingRouteModel).toJson();
+        break;
+      case TransitRouteModel:
+        routes[route.routeType.toString()] =
+            (type as TransitRouteModel).toJson();
+        break;
+      case FlightRouteModel:
+        routes[route.routeType.toString()] =
+            (type as FlightRouteModel).toJson();
+        break;
+      default:
+        routes[route.routeType.toString()] = (type as BaseRouteModel).toJson();
+        break;
+    }
+  }
 }

@@ -1,5 +1,7 @@
 enum FuelType { gasoline, diesel, electric, hybrid }
 
+enum RouteType { vechile, walking, bicycling, transit, flight }
+
 class BasicFunc {
 //  Enum
 
