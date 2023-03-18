@@ -8,18 +8,21 @@ class VechileRouteModel extends BaseRouteModel {
     required this.distance,
     required this.duration,
     required this.fuelType,
+    required this.polyline,
     required this.fuelConsumptionMicroliters,
     required this.routeLabels,
     this.savedConsumption,
     this.savedEmmissions,
   }) : super(
-          routeType: RouteType.vechile,
+          routeType: RouteType.driving,
           distance: distance,
           duration: duration,
         );
 
   factory VechileRouteModel.fromJson(Map<String, dynamic> json) {
     return VechileRouteModel(
+      // ignore: avoid_dynamic_calls
+      polyline: json['polyline']['encodedPolyline'] as String,
       distance: json['distanceMeters'] as int,
       duration: int.parse(
         (json['duration'] as String)
@@ -41,11 +44,7 @@ class VechileRouteModel extends BaseRouteModel {
   }
 
   // Setters
-  // void setSavedConsumption(int savedConsumption) {
-  //   this.savedConsumption = savedConsumption;
-  // }
-
-  // toJson
+  void setDistance(int distance) => this.distance = distance;
   Map<String, dynamic> toJson() => {
         'distance': distance,
         'duration': duration,
@@ -54,13 +53,15 @@ class VechileRouteModel extends BaseRouteModel {
         'savedConsumption': savedConsumption,
         'savedEmmissions': savedEmmissions,
         'fuelType': fuelType.toString().split('.').last,
+        'polyline': polyline,
       };
 
-  final int distance;
+  int distance;
   final int duration;
   final int fuelConsumptionMicroliters;
   final List<dynamic> routeLabels;
   final FuelType fuelType;
+  final String polyline;
   int? savedConsumption;
   int? savedEmmissions;
 }

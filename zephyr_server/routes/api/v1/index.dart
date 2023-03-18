@@ -2,22 +2,30 @@ import 'dart:convert';
 
 import 'package:dart_frog/dart_frog.dart';
 
-import '../../../models/route_request_model.dart';
-import '../../../services/routeApiService/route_service.dart';
-
 Future<Response> onRequest(RequestContext context) async {
-  // final
-  // Get request body
   final request = context.request;
-  final body = await request.body();
-  final jsonBody = jsonDecode(body);
-  // print(jsonBody);
-  final routeRequestModel =
-      RouteRequestModel.fromJson(jsonBody as Map<String, dynamic>);
-  final routeService = RouteService();
-  final routeModel = await routeService.getRoute(routeRequestModel);
-  final result = await routeService.getFuelEfficientRoute(routeModel);
 
-  return Response.json(
-      body: result.map((key, value) => MapEntry(key, value.toJson())));
+  switch (request.method) {
+    case HttpMethod.get:
+      return Response.json(body: {'status': 'API is running'});
+    case HttpMethod.head:
+    case HttpMethod.options:
+    case HttpMethod.patch:
+      return Response(
+        statusCode: 405,
+        body: '${request.method} operation is not supported',
+      );
+    case HttpMethod.delete:
+      return Response(
+        statusCode: 405,
+        body: '${request.method} operation requires a id',
+      );
+    case HttpMethod.post:
+      return Response.json(body: {'status': 'API is running'});
+    case HttpMethod.put:
+      return Response(
+        statusCode: 405,
+        body: '${request.method} operation requires a id',
+      );
+  }
 }

@@ -1,3 +1,4 @@
+import '../func/basic.dart';
 import 'location_model.dart';
 
 class RouteRequestModel {
@@ -15,7 +16,16 @@ class RouteRequestModel {
         origin: Location.fromJson(json['origin'] as Map<String, dynamic>),
         destination:
             Location.fromJson(json['destination'] as Map<String, dynamic>),
-        travelMode: json['travelMode'] as String,
+        travelMode: RouteType.values.firstWhere(
+          (e) {
+            print(
+              e.toString().split('.').last.toUpperCase() +
+                  (json['travelMode'] as String),
+            );
+            return e.toString().split('.').last.toUpperCase() ==
+                json['travelMode'] as String;
+          },
+        ),
         routingPreference: json['routingPreference'] as String,
         requestedReferenceRoutes:
             json['requestedReferenceRoutes'] as List<dynamic>,
@@ -24,7 +34,7 @@ class RouteRequestModel {
 
   final Location origin;
   final Location destination;
-  final String travelMode;
+  final RouteType travelMode;
   final String routingPreference;
   final List<dynamic> requestedReferenceRoutes;
   final Map<dynamic, dynamic> vehicleInfo;

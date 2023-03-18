@@ -1,4 +1,5 @@
 import '../../func/basic.dart';
+import '../../models/routeModels/transit_route_model.dart';
 import '../../models/routeModels/vechile_route_model.dart';
 import '../../models/route_request_model.dart';
 import '../base_api_service.dart';
@@ -12,9 +13,12 @@ class RouteService extends BaseApiService {
     'distance': 'routes.distanceMeters',
     'duration': 'routes.duration',
     'routeLabels': 'routes.routeLabels',
+    // provideRouteAlternatives
     'fuelConsumptionMicroliters':
         'routes.travelAdvisory.fuelConsumptionMicroliters',
-    'routeToken': 'routes.routeToken',
+    // 'routeToken': 'routes.routeToken',
+    // Polyline
+    'polyline': 'routes.polyline',
   };
 
   /// Get Route
@@ -24,11 +28,28 @@ class RouteService extends BaseApiService {
   /// Description:
   ///  - Get Route from Route Request Model
   Future<List<VechileRouteModel>> getRoute(
-      RouteRequestModel routeRequestModel) async {
+    RouteRequestModel routeRequestModel,
+  ) async {
     final origin = routeRequestModel.origin.toJson();
     final destination = routeRequestModel.destination.toJson();
     origin.remove('name');
     destination.remove('name');
+
+    String kTravelMode() {
+      switch (routeRequestModel.travelMode) {
+        case RouteType.driving:
+          return 'DRIVE';
+        case RouteType.bicycling:
+          return 'BICYCLE';
+        case RouteType.walking:
+          return 'WALK';
+        case RouteType.transit:
+          return 'TRANSIT';
+        case RouteType.flight:
+          return 'NOT_SUPPORTED';
+      }
+    }
+
     final data = {
       'origin': {
         'location': {'latLng': origin}
@@ -41,12 +62,20 @@ class RouteService extends BaseApiService {
       'routeModifiers': {
         'vehicleInfo': routeRequestModel.vehicleInfo,
       },
-      'travelMode': routeRequestModel.travelMode,
+      // Show Route Alternatives
+      'computeAlternativeRoutes': true,
+      'travelMode': kTravelMode(),
+
       'routingPreference': routeRequestModel.routingPreference,
       'requestedReferenceRoutes': routeRequestModel.requestedReferenceRoutes,
     };
-    final response = await post(':computeRoutes', data,
-        ['X-Goog-FieldMask', fieldMask.values.join(',')]);
+    final response = await post(
+      ':computeRoutes',
+      data,
+      ['X-Goog-FieldMask', fieldMask.values.join(',')],
+    );
+
+    print(response);
 
     // Add Fuel Type to Route Model
     for (var i = 0; i < (response['routes'] as List).length; i++) {
@@ -63,8 +92,9 @@ class RouteService extends BaseApiService {
   /// - [return] Map<String, VechileRouteModel>
   /// Description:
   /// - Get ["FUEL_EFFICIENT"] route from List<VechileRouteModel>
-  Map<String, VechileRouteModel> getFuelEfficientRoute(
-      List<VechileRouteModel> routes) {
+  Map<String, List<VechileRouteModel>> getFuelEfficientRoute(
+    List<VechileRouteModel> routes,
+  ) {
     final fuel = routes.firstWhere((element) {
       if (element.routeLabels.contains('FUEL_EFFICIENT')) {
         return true;
@@ -72,22 +102,53 @@ class RouteService extends BaseApiService {
       return false;
     });
 
-    final defaultRoute = routes.firstWhere((element) {
-      if (element.routeLabels.contains('DEFAULT_ROUTE')) {
+    final defaultRoute = routes.where((element) {
+      if (element.routeLabels.contains('DEFAULT_ROUTE') ||
+          element.routeLabels.contains('DEFAULT_ROUTE_ALTERNATE')) {
         return true;
       }
       return false;
-    });
+    }).toList();
 
-    final savedFuel = (defaultRoute.fuelConsumptionMicroliters) -
-        (fuel.fuelConsumptionMicroliters).abs();
+    // Calculate Saved Fuel
+    // Pick the minimum duration route and get the fuel consumption and get the
+    // difference between the fuel efficient route and minimum duration route
+    final idealRoute = defaultRoute.reduce(
+      (value, element) => value.duration < element.duration ? value : element,
+    );
+    final savedFuel =
+        idealRoute.fuelConsumptionMicroliters - fuel.fuelConsumptionMicroliters;
 
     fuel
       ..savedConsumption = savedFuel
       ..savedEmmissions =
           basifunc.calculateEmissionsSaved(routes[0].fuelType, savedFuel);
-    return {'fuelEfficientRoute': fuel, 'defaultRoute': defaultRoute};
+    for (final element in defaultRoute) {
+      element
+        ..savedConsumption = idealRoute.fuelConsumptionMicroliters -
+            element.fuelConsumptionMicroliters
+        ..savedEmmissions = basifunc.calculateEmissionsSaved(
+          routes[0].fuelType,
+          idealRoute.fuelConsumptionMicroliters -
+              element.fuelConsumptionMicroliters,
+        );
+    }
+
+    return {
+      'fuelEfficientRoute': [fuel],
+      // Return List of .toMap of defaultRoute
+      'otherRoutes': defaultRoute
+    };
   }
 
-  /// Get Recommended Route
+  /// Get Transit Routes
+  ///  - [routes] List<Tra =>
+  /// - [return] List<VechileRouteModel>
+  /// Description:
+  /// - Get Other Routes
+  Future<List<TransitRouteModel>> getTransitRoutes(
+    RouteRequestModel routeRequestModel,
+  ) async {
+    return [];
+  }
 }
