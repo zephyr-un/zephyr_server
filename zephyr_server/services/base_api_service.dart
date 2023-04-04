@@ -3,15 +3,14 @@ import 'dart:io';
 
 class BaseApiService {
   static const String baseUrl = 'https://routes.googleapis.com/directions/v2';
-  static const String apiKey = 'AIzaSyBlFXfZNXaX_9I_Rls8ExqxkTu6OI1X3e0';
+  static const String apiKey = String.fromEnvironment('API_KEY');
   static Future<dynamic> get(String url) async {
     final response = await HttpClient().getUrl(Uri.parse(baseUrl + url));
     final responseBody = await response.close();
     return json.decode(await responseBody.transform(utf8.decoder).join());
   }
 
-   Future<dynamic> post(
-      String url, dynamic data, List<String> headers) async { 
+  Future<dynamic> post(String url, dynamic data, List<String> headers) async {
     final response = await HttpClient().postUrl(Uri.parse(baseUrl + url))
       ..headers.contentType = ContentType.json
       ..headers.set(headers[0], headers[1])

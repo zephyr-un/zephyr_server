@@ -30,6 +30,9 @@ class RouteService extends BaseApiService {
   Future<List<VechileRouteModel>> getRoute(
     RouteRequestModel routeRequestModel,
   ) async {
+    if (routeRequestModel.travelMode != RouteType.driving) {
+      throw UnsupportedError('Only Driving is supported');
+    }
     final origin = routeRequestModel.origin.toJson();
     final destination = routeRequestModel.destination.toJson();
     origin.remove('name');
@@ -149,6 +152,41 @@ class RouteService extends BaseApiService {
   Future<List<TransitRouteModel>> getTransitRoutes(
     RouteRequestModel routeRequestModel,
   ) async {
+    if (routeRequestModel.travelMode != RouteType.transit) {
+      throw UnsupportedError('Only Transit is supported');
+    }
+    final origin = routeRequestModel.origin.toJson();
+    final destination = routeRequestModel.destination.toJson();
+
+    origin.remove('name');
+    destination.remove('name');
+
+    // https://maps.googleapis.com/maps/api/directions/
+
+    final data = {
+      'origin': {
+        'location': {'latLng': origin}
+      },
+      'destination': {
+        'location': {
+          'latLng': destination,
+        }
+      },
+      'routeModifiers': {
+        'vehicleInfo': routeRequestModel.vehicleInfo,
+      },
+      // Show Route Alternatives
+      'computeAlternativeRoutes': true,
+      'travelMode': 'TRANSIT',
+      'routingPreference': routeRequestModel.routingPreference,
+      'requestedReferenceRoutes': routeRequestModel.requestedReferenceRoutes,
+    };
+
+    final response = await post(
+      ':computeRoutes',
+      data,
+      ['X-Goog-FieldMask', fieldMask.values.join(',')],
+    );
     return [];
   }
 }

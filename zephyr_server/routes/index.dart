@@ -1,9 +1,11 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:firedart/firedart.dart';
 
-import '../func/req.dart';
 
-const API_KEY = 'AIzaSyBlFXfZNXaX_9I_Rls8ExqxkTu6OI1X3e0';
+
+
+
+const API_KEY = String.fromEnvironment('API_KEY');
 
 final firebaseAuth = FirebaseAuth.initialize(
   API_KEY,
