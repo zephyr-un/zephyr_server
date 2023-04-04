@@ -1,11 +1,9 @@
+import 'dart:io';
+
 import 'package:dart_frog/dart_frog.dart';
 import 'package:firedart/firedart.dart';
 
-
-
-
-
-const API_KEY = String.fromEnvironment('API_KEY');
+var API_KEY = Platform.environment['API_KEY']!;
 
 final firebaseAuth = FirebaseAuth.initialize(
   API_KEY,
@@ -16,6 +14,7 @@ final firebaseAuth = FirebaseAuth.initialize(
 /// Run status of API
 
 Response onRequest(RequestContext context) {
+
   final request = context.request;
 
   switch (request.method) {

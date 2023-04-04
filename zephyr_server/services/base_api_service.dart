@@ -3,7 +3,7 @@ import 'dart:io';
 
 class BaseApiService {
   static const String baseUrl = 'https://routes.googleapis.com/directions/v2';
-  static const String apiKey = String.fromEnvironment('API_KEY');
+  static String apiKey = Platform.environment['API_KEY']!;
   static Future<dynamic> get(String url) async {
     final response = await HttpClient().getUrl(Uri.parse(baseUrl + url));
     final responseBody = await response.close();
